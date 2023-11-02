@@ -5,7 +5,7 @@ assert() {
 
     ./xcc "$input" > tmp.s
     cc -o tmp tmp.s
-    ./tmp.s actual="$?"
+    ./tmp actual="$?"
 
     if [ "$actual" = "$expected" ]; then
         echo "$input => $actual"
