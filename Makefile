@@ -1,11 +1,11 @@
 CFLAGS=-std=c11 -g -static
 
-xcc: xcc.c
+tokenizer: tokenizer.c
 
-test: xcc
+test: tokenizer
 		./test.sh
 
 clean:
-		rm -f xcc *.o *~ tmp*
+		rm -f tokenizer *.o *~ tmp*
 
 .PHONY: test clean
