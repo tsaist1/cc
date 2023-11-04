@@ -16,9 +16,10 @@ typedef struct Token Token;
 
 struct Token {
     TokenKind kind; // token type
-    Token *next;     // next input token
+    Token *next;    // next input token
     int val;
-    char *str;
+    char *str;      // token string
+    int len;        // token length
 };
 
 // current token
@@ -49,7 +50,9 @@ void error_at(char *loc, char *fmt, ...) {
 
 // if next token is expected read forward next token
 bool consume(char op) {
-    if (token->kind != TK_RESERVED || token->str[0] != op)
+    if (token->kind != TK_RESERVED ||
+        strlen(op) != token->len ||
+        memcmp(token->str, op, token->len))
         return false;
     token = token->next;
     return true;
