@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-// token type
+// ** Tokenizer *********************************************************
 typedef enum
 {
     TK_RESERVED, // symbols
@@ -13,8 +13,8 @@ typedef enum
     TK_EOF,
 } TokenKind;
 
+// Token type
 typedef struct Token Token;
-
 struct Token
 {
     TokenKind kind; // token type
@@ -23,6 +23,8 @@ struct Token
     char *str; // token string
     int len;   // token length
 };
+
+static char *user_input;
 
 // current token
 Token *token;
@@ -35,14 +37,12 @@ void error(char *fmt, ...)
     fprintf(stderr, "\n");
     exit(1);
 }
-char *user_input;
 
 // report error msg
 void error_at(char *loc, char *fmt, ...)
 {
     va_list ap;
     va_start(ap, fmt);
-
     int pos = loc - user_input;
     fprintf(stderr, "%s\n", user_input);
     fprintf(stderr, "%*s", pos, " ");
@@ -55,9 +55,10 @@ void error_at(char *loc, char *fmt, ...)
 // if next token is expected read forward next token
 bool consume(char op)
 {
-    if (token->kind != TK_RESERVED ||
-        strlen(op) != token->len ||
-        memcmp(token->str, op, token->len))
+    // if (token->kind != TK_RESERVED ||
+    //     strlen(op) != token->len ||
+    //     memcmp(token->str, op, token->len))
+    if (token->kind != TK_RESERVED || token->str[0] != op)
         return false;
     token = token->next;
     return true;
@@ -66,7 +67,7 @@ bool consume(char op)
 void expect(char op)
 {
     if (token->kind != TK_RESERVED || token->str[0] != op)
-        error("'%c', is not ", op);
+        error("'%c' is not ", op);
     token = token->next;
 }
 
@@ -107,7 +108,7 @@ Token *tokenize(char *p)
             continue;
         }
 
-        if (*p == '+' || *p == '-')
+        if (ispunct(*p))
         {
             cur = new_token(TK_RESERVED, cur, p++);
             continue;
@@ -120,13 +121,13 @@ Token *tokenize(char *p)
             continue;
         }
 
-        error("cannot tokenize");
+        error_at(p, "cannot tokenize");
     }
     new_token(TK_EOF, cur, p);
     return head.next;
 }
 
-// AST type nodes
+// ** Parser *********************************************************
 typedef enum
 {
     ND_ADD, // +
@@ -134,10 +135,13 @@ typedef enum
     ND_MUL, // *
     ND_DIV, // /
     ND_NUM, // integer
+    ND_NEG, // unary -
+    ND_EQ,  // ==
+    ND_NE,  // !=
 } NodeKind;
 
+// AST node type
 typedef struct Node Node;
-
 struct Node
 {
     NodeKind kind; // node type
@@ -165,9 +169,14 @@ Node *new_node_num(int val)
 // AST using EBNF (Extended Backus-Naur form)
 // recursive descending parsing
 Node *expr();
+Node *equality();
+Node *relational();
+Node *add();
 Node *mul();
+Node *unary();
 Node *primary();
 
+// epxr = mul ("+" mul | "-" mul)* 
 Node *expr()
 {
     Node *node = mul();
@@ -187,7 +196,6 @@ Node *mul()
     Node *node = primary();
     for (;;)
     {
-
         if (consume('*'))
             node = new_node(ND_MUL, node, primary());
         else if (consume('/'))
@@ -215,9 +223,10 @@ Node *unary()
         return primary();
     if (consume('-'))
         return new_node(ND_SUB, new_node_num(0), primary());
-    return primary;
+    return primary();
 }
 
+// ** Code generator *********************************************************
 void gen(Node *node)
 {
     if (node->kind == ND_NUM)
@@ -235,7 +244,7 @@ void gen(Node *node)
     switch (node->kind)
     {
     case ND_ADD:
-        printf("add rax, rdi\n");
+        printf("	add rax, rdi\n");
         break;
     case ND_SUB:
         printf("	sub rax, rdi\n");
@@ -260,7 +269,7 @@ int main(int argc, char **argv)
     }
 
     user_input = argv[1];
-    token = tokenize(argv[1]);
+    token = tokenize(user_input);
     Node *node = expr();
 
     printf(".intel_syntax noprefix\n");
