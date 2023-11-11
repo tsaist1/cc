@@ -53,21 +53,21 @@ void error_at(char *loc, char *fmt, ...)
 }
 
 // if next token is expected read forward next token
-bool consume(char op)
+bool consume(char *op)
 {
-    // if (token->kind != TK_RESERVED ||
-    //     strlen(op) != token->len ||
-    //     memcmp(token->str, op, token->len))
-    if (token->kind != TK_RESERVED || token->str[0] != op)
+    if (token->kind != TK_RESERVED || strlen(op) != token->len ||
+        memcmp(token->str, op, token->len))
         return false;
+    
     token = token->next;
     return true;
 }
 
-void expect(char op)
+void expect(char *op)
 {
-    if (token->kind != TK_RESERVED || token->str[0] != op)
-        error("'%c' is not ", op);
+    if (token->kind != TK_RESERVED || strlen(op) != token->len ||
+        memcmp(token->str, op, token->len))
+        error_at(token->str, "expected \"%s\"", op);
     token = token->next;
 }
 
@@ -85,11 +85,12 @@ bool at_eof()
     return token->kind == TK_EOF;
 }
 
-Token *new_token(TokenKind kind, Token *cur, char *str)
+Token *new_token(TokenKind kind, Token *cur, char *str, int len)
 {
     Token *tok = calloc(1, sizeof(Token)); // calloc zeroes out memory
     tok->kind = kind;
     tok->str = str;
+    tok->len = len;
     cur->next = tok;
     return tok;
 }
@@ -110,7 +111,7 @@ Token *tokenize(char *p)
 
         if (ispunct(*p))
         {
-            cur = new_token(TK_RESERVED, cur, p++);
+            cur = new_token(TK_RESERVED, cur, p++, 1);
             continue;
         }
 
@@ -123,7 +124,7 @@ Token *tokenize(char *p)
 
         error_at(p, "cannot tokenize");
     }
-    new_token(TK_EOF, cur, p);
+    new_token(TK_EOF, cur, p, 0);
     return head.next;
 }
 
@@ -182,9 +183,9 @@ Node *expr()
     Node *node = mul();
     for (;;)
     {
-        if (consume('+'))
+        if (consume("+"))
             node = new_node(ND_ADD, node, mul());
-        else if (consume('-'))
+        else if (consume("-"))
             node = new_node(ND_SUB, node, mul());
         else
             return node;
@@ -196,9 +197,9 @@ Node *mul()
     Node *node = unary();
     for (;;)
     {
-        if (consume('*'))
+        if (consume("*"))
             node = new_node(ND_MUL, node, unary());
-        else if (consume('/'))
+        else if (consume("/"))
             node = new_node(ND_DIV, node, unary());
         else
             return node;
@@ -207,9 +208,9 @@ Node *mul()
 
 Node *unary()
 {
-    if (consume('+'))
+    if (consume("+"))
         return primary();
-    if (consume('-'))
+    if (consume("-"))
         return new_node(ND_SUB, new_node_num(0), primary());
     return primary();
 }
@@ -217,10 +218,10 @@ Node *unary()
 Node *primary()
 {
     // if next token is "(", it should be "(" expr ")"
-    if (consume('('))
+    if (consume("("))
     {
         Node *node = expr();
-        expect(')');
+        expect(")");
         return node;
     }
     return new_node_num(expect_number());
