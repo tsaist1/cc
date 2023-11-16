@@ -117,7 +117,8 @@ Token *tokenize(char *p)
 
         if (isdigit(*p))
         {
-            cur = new_token(TK_NUM, cur, p);
+            int len = strlen(p);
+            cur = new_token(TK_NUM, cur, p, len);
             cur->val = strtol(p, &p, 10);
             continue;
         }
