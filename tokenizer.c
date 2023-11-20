@@ -26,7 +26,7 @@ struct Token
 
 bool startswith(char *p, char *q)
 {
-    return memcpy(p, q, strlen(q)) == 0;
+    return memcmp(p, q, strlen(q)) == 0;
 }
 
 static char *user_input;
@@ -318,23 +318,23 @@ void gen(Node *node)
         printf("	idiv rdi\n");
         break;
     case ND_EQ:
-        printf("    cmp rax, rdi");
-        printf("    sete al");
+        printf("    cmp rax, rdi\n");
+        printf("    sete al\n");
         printf("    movzb rax, al\n");
         break;
     case ND_NE:
-        printf("    cmp rax, rdi");
-        printf("    setne al");
+        printf("    cmp rax, rdi\n");
+        printf("    setne al\n");
         printf("    movzb rax, al\n");
         break;
     case ND_LT:
-        printf("    cmp rax, rdi");
-        printf("    setl al");
+        printf("    cmp rax, rdi\n");
+        printf("    setl al\n");
         printf("    movzb rax, al\n");
         break;
     case ND_LE:
-        printf("    cmp rax, rdi");
-        printf("    setle al");
+        printf("    cmp rax, rdi\n");
+        printf("    setle al\n");
         printf("    movzb rax, al\n");
         break;
     }
