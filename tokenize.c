@@ -74,8 +74,9 @@ bool startswith(char *p, char *q)
     return memcmp(p, q, strlen(q)) == 0;
 }
 
-Token *tokenize(char *p)
+Token *tokenize()
 {
+    char *p = user_input;
     Token head;
     head.next = NULL;
     Token *cur = &head;
