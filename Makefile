@@ -1,11 +1,16 @@
 CFLAGS=-std=c11 -g -static
+SRCS=$(wildcard *.c)
+OBJS=$(SRCS:.c=.o)
 
-tokenizer: tokenizer.c
+tcc: $(OBJS)
+	$(CC) -o $@ $(OBJS) $(LDFLAGS)
 
-test: tokenizer
+$(OBJS): tcc.h
+
+test: tcc
 		./test.sh
 
 clean:
-		rm -f tokenizer *.o *~ tmp*
+		rm -f tcc *.o *~ tmp*
 
 .PHONY: test clean
