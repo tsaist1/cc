@@ -1,10 +1,6 @@
 #include "tcc.h"
 
-
-
-static char *user_input;
-
-// current token
+char *user_input;
 Token *token;
 
 void error(char *fmt, ...)
@@ -72,6 +68,7 @@ Token *new_token(TokenKind kind, Token *cur, char *str, int len)
     cur->next = tok;
     return tok;
 }
+
 bool startswith(char *p, char *q)
 {
     return memcmp(p, q, strlen(q)) == 0;
