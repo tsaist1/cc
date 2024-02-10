@@ -55,14 +55,14 @@ void gen(Node *node)
 }
 
 void codegen(Node *node) {
-  printf(".intel_syntax noprefix\n");
-  printf(".global main\n");
-  printf("main:\n");
+    printf(".intel_syntax noprefix\n");
+    printf(".global main\n");
+    printf("main:\n");
 
-  gen(node);
+    gen(node);
 
-  // A result must be at the top of the stack, so pop it
-  // to RAX to make it a program exit code.
-  printf("  pop rax\n");
-  printf("  ret\n");
+    // A result must be at the top of the stack, so pop it
+    // to RAX to make it a program exit code.
+    printf("    pop rax\n");
+    printf("    ret\n");
 }

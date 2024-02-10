@@ -1,5 +1,17 @@
 #include "tcc.h"
 
+// ***** Parsing Grammar *****
+// program    = stmt*
+// stmt       = expr ";"
+// expr       = assign
+// assign     = equality ("=" assign)?
+// equality   = relational ("==" relational | "!=" relational)*
+// relational = add ("<" add | "<=" add | ">" add | ">=" add)*
+// add        = mul ("+" mul | "-" mul)*
+// mul        = unary ("*" unary | "/" unary)*
+// unary      = ("+" | "-")? primary
+// primary    = num | ident | "(" expr ")"
+    
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 {
     Node *node = calloc(1, sizeof(Node));
@@ -16,6 +28,7 @@ Node *new_node_num(int val)
     node->val = val;
     return node;
 }
+
 // AST using EBNF (Extended Backus-Naur form)
 // recursive descent parser
 // forward declarations for mutually recursive procedures
@@ -27,13 +40,11 @@ Node *mul();
 Node *unary();
 Node *primary();
 
-// expr = equality
 Node *expr()
 {
     return equality();
 }
 
-// equality = relational ("==" relational | "!=" relational)*
 Node *equality()
 {
     Node *node = relational();
@@ -48,7 +59,6 @@ Node *equality()
     }
 }
 
-// relational = add ("<" add | "<=" add | ">" add | ">=" add)*
 Node *relational()
 {
     Node *node = add();
@@ -67,7 +77,6 @@ Node *relational()
     }
 }
 
-// add = mul ("+" mul | "-" mul)*
 Node *add()
 {
     Node *node = mul();
@@ -82,7 +91,6 @@ Node *add()
     }
 }
 
-// mul = unary ("*" unary | "/" unary)*
 Node *mul()
 {
     Node *node = unary();
@@ -97,8 +105,6 @@ Node *mul()
     }
 }
 
-// unary = ("+" | "-")? unary
-//         | primary
 Node *unary()
 {
     if (consume("+"))
@@ -108,7 +114,6 @@ Node *unary()
     return primary();
 }
 
-// primary = "(" expr ")" | num
 Node *primary()
 {
     // if next token is "(", it should be "(" expr ")"

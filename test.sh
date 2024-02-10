@@ -1,10 +1,11 @@
 #!/bin/bash
+
 assert() {
     expected="$1"
     input="$2"
 
     ./tcc "$input" > tmp.s
-    cc -o tmp tmp.s
+    gcc -static -Wall -o tmp tmp.s
     ./tmp 
     actual="$?"
 

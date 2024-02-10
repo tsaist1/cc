@@ -111,6 +111,11 @@ Token *tokenize()
             continue;
         }
 
+        if ('a' <= *p && *p <= 'z') {
+            cur = new_token(TK_IDENT, cur, p++, 1);
+            cur->len = 1;
+        }
+        
         error_at(p, "cannot tokenize");
     }
     new_token(TK_EOF, cur, p, 0);
