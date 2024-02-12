@@ -40,29 +40,33 @@ extern Token *token;
 // ** Parser *********************************************************
 typedef enum
 {
-    ND_ADD, // +
-    ND_SUB, // -
-    ND_MUL, // *
-    ND_DIV, // /
-    ND_NUM, // integer
-    ND_NEG, // unary -
-    ND_EQ,  // ==
-    ND_NE,  // !=
-    ND_LT,  // <
-    ND_LE,  // <=
-
+    ND_ADD,    // +
+    ND_SUB,    // -
+    ND_MUL,    // *
+    ND_DIV,    // /
+    ND_ASSIGN, // =
+    ND_LVAR,   // local variable
+    ND_NUM,    // integer
+    ND_NEG,    // unary -
+    ND_EQ,     // ==
+    ND_NE,     // !=
+    ND_LT,     // <
+    ND_LE,     // <=
 } NodeKind;
 
-// AST node type
 typedef struct Node Node;
+
 struct Node
 {
     NodeKind kind; // Node type
+    Node *next;
     Node *lhs;
     Node *rhs;
     int val;	   // Used if kind == ND_NUM
+    int offset;
+     
 };
 
-Node *expr();
+Node *program();
 
 void codegen(Node *node);

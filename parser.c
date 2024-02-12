@@ -1,17 +1,18 @@
 #include "tcc.h"
 
-// ***** Parsing Grammar *****
-// program    = stmt*
-// stmt       = expr ";"
-// expr       = assign
-// assign     = equality ("=" assign)?
-// equality   = relational ("==" relational | "!=" relational)*
-// relational = add ("<" add | "<=" add | ">" add | ">=" add)*
-// add        = mul ("+" mul | "-" mul)*
-// mul        = unary ("*" unary | "/" unary)*
-// unary      = ("+" | "-")? primary
-// primary    = num | ident | "(" expr ")"
-    
+/* ***** Parsing Grammar *****
+ program    = stmt*
+ stmt       = expr ";"
+ expr       = assign
+ assign     = equality ("=" assign)?
+ equality   = relational ("==" relational | "!=" relational)*
+ relational = add ("<" add | "<=" add | ">" add | ">=" add)*
+ add        = mul ("+" mul | "-" mul)*
+ mul        = unary ("*" unary | "/" unary)*
+ unary      = ("+" | "-")? primary
+ primary    = num | ident | "(" expr ")"
+*/
+
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs)
 {
     Node *node = calloc(1, sizeof(Node));
@@ -29,9 +30,10 @@ Node *new_node_num(int val)
     return node;
 }
 
-// AST using EBNF (Extended Backus-Naur form)
-// recursive descent parser
+/* AST using EBNF (Extended Backus-Naur form)
+   recursive descent parser */ 
 // forward declarations for mutually recursive procedures
+Node *stmt();
 Node *expr();
 Node *equality();
 Node *relational();
@@ -40,9 +42,37 @@ Node *mul();
 Node *unary();
 Node *primary();
 
+Node *program() 
+{
+    Node head;
+    head.next = NULL;
+    Node *cur = &head;
+
+    while (!at_eof()) {
+        cur->next = stmt();
+        cur = cur->next;
+    }
+    return head.next;
+}
+
+Node *assign() 
+{
+    Node *node = equality();
+    if (consume("="))
+        node = new_node(ND_ASSIGN, node, assign());
+    return node;
+}
+
 Node *expr()
 {
     return equality();
+}
+
+Node *stmt()
+{
+    Node *node = expr();
+    expect(";");
+    return node;
 }
 
 Node *equality()
@@ -123,6 +153,6 @@ Node *primary()
         expect(")");
         return node;
     }
+    
     return new_node_num(expect_number());
 }
-
