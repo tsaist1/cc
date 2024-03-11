@@ -78,8 +78,7 @@ Node *stmt()
 Node *equality()
 {
     Node *node = relational();
-    for (;;)
-    {
+    for (;;) {
         if (consume("=="))
             node = new_node(ND_EQ, node, relational());
         else if (consume("!="))
@@ -92,8 +91,7 @@ Node *equality()
 Node *relational()
 {
     Node *node = add();
-    for (;;)
-    {
+    for (;;) {
         if (consume("<"))
             node = new_node(ND_LT, node, add());
         else if (consume("<="))
@@ -110,8 +108,7 @@ Node *relational()
 Node *add()
 {
     Node *node = mul();
-    for (;;)
-    {
+    for (;;) {
         if (consume("+"))
             node = new_node(ND_ADD, node, mul());
         else if (consume("-"))
@@ -124,8 +121,7 @@ Node *add()
 Node *mul()
 {
     Node *node = unary();
-    for (;;)
-    {
+    for (;;) {
         if (consume("*"))
             node = new_node(ND_MUL, node, unary());
         else if (consume("/"))
@@ -146,9 +142,7 @@ Node *unary()
 
 Node *primary()
 {
-    // if next token is "(", it should be "(" expr ")"
-    if (consume("("))
-    {
+    if (consume("(")) {
         Node *node = expr();
         expect(")");
         return node;

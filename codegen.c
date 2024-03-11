@@ -4,8 +4,7 @@
 // ** Code generator *********************************************************
 void gen(Node *node)
 {
-    if (node->kind == ND_NUM)
-    {
+    if (node->kind == ND_NUM) {
         printf("    push %d\n", node->val);
         return;
     }
@@ -16,8 +15,7 @@ void gen(Node *node)
     printf("	pop rdi\n");
     printf("	pop rax\n");
 
-    switch (node->kind)
-    {
+    switch (node->kind) {
     case ND_ADD:
         printf("	add rax, rdi\n");
         break;

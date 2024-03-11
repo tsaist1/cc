@@ -81,29 +81,24 @@ Token *tokenize()
     head.next = NULL;
     Token *cur = &head;
 
-    while (*p)
-    {
-        if (isspace(*p))
-        {
+    while (*p) {
+        if (isspace(*p)) {
             p++;
             continue;
         }
 
         if (startswith(p, "==") || startswith(p, "!=") ||
-            startswith(p, "<=") || startswith(p, ">="))
-        {
+            startswith(p, "<=") || startswith(p, ">=")) {
             cur = new_token(TK_RESERVED, cur, p, 2);
             p += 2;
         }
 
-        if (ispunct(*p))
-        {
+        if (ispunct(*p)) {
             cur = new_token(TK_RESERVED, cur, p++, 1);
             continue;
         }
-
-        if (isdigit(*p))
-        {
+        
+        if (isdigit(*p)) {
             cur = new_token(TK_NUM, cur, p, 0);
             char *q = p;
             cur->val = strtol(p, &p, 10);
@@ -119,6 +114,7 @@ Token *tokenize()
         
         error_at(p, "cannot tokenize");
     }
+        
     new_token(TK_EOF, cur, p, 0);
     return head.next;
 }
