@@ -4,9 +4,18 @@
 // ** Code generator *********************************************************
 void gen(Node *node)
 {
-    if (node->kind == ND_NUM)
-    {
+    switch (node->kind) {
+    case ND_NUM:
         printf("    push %d\n", node->val);
+        return;
+    case ND_EXPR_STMT:
+        gen(node->lhs);
+        printf("	add rsp, 8\n");
+        return;
+    case ND_RETURN:
+        gen(node->lhs);
+        printf("	pop rax\n");
+        printf("	ret\n");
         return;
     }
 
@@ -16,8 +25,7 @@ void gen(Node *node)
     printf("	pop rdi\n");
     printf("	pop rax\n");
 
-    switch (node->kind)
-    {
+    switch (node->kind) {
     case ND_ADD:
         printf("	add rax, rdi\n");
         break;
@@ -62,7 +70,7 @@ void codegen(Node *node) {
 
     for (Node *n = node; n; n = n->next) {
         gen(n);
-        printf("	pop rax\n");
+        // printf("	pop rax\n");
     }
 
     printf("    ret\n");

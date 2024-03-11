@@ -40,18 +40,21 @@ extern Token *token;
 // ** Parser *********************************************************
 typedef enum
 {
-    ND_ADD,    // +
-    ND_SUB,    // -
-    ND_MUL,    // *
-    ND_DIV,    // /
-    ND_ASSIGN, // =
-    ND_LVAR,   // local variable
-    ND_NUM,    // integer
-    ND_NEG,    // unary -
-    ND_EQ,     // ==
-    ND_NE,     // !=
-    ND_LT,     // <
-    ND_LE,     // <=
+    ND_ADD,       // +
+    ND_SUB,       // -
+    ND_MUL,       // *
+    ND_DIV,       // /
+    ND_EQ,        // ==
+    ND_NE,        // !=
+    ND_LT,        // <
+    ND_LE,        // <=
+    ND_RETURN,    // "return"
+    ND_EXPR_STMT, // Expression statement
+    ND_NUM,       // integer
+    
+    ND_LVAR,      // local variable
+    ND_NEG,       // unary -
+    ND_ASSIGN,    // =
 } NodeKind;
 
 typedef struct Node Node;
