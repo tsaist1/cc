@@ -17,7 +17,7 @@ assert() {
     fi
 }
 
-assert 0 '0;'
+assert 0 'return 0;'
 assert 42 '42;'
 assert 41 ' 12 + 34 - 5 ; '
 assert 47 '5+6*7;'
