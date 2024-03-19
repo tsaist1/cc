@@ -8,10 +8,10 @@
 // ** Tokenizer *********************************************************
 typedef enum
 {
-    TK_RESERVED, // symbols
-    TK_IDENT,	 // identifer
-    TK_NUM,		 // integer
-    TK_EOF,
+    TK_RESERVED,   // Keywords or punctuators
+    TK_IDENTIFIER, // Identifier
+    TK_NUM,        // Integer
+    TK_EOF,		   // End of file markers
 } TokenKind;
 
 // Token type
