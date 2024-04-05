@@ -1,18 +1,5 @@
 #include "tcc.h"
 
-/* ***** Parsing Grammar *****
- program    = stmt*
- stmt       = expr ";"
- expr       = assign
- assign     = equality ("=" assign)?
- equality   = relational ("==" relational | "!=" relational)*
- relational = add ("<" add | "<=" add | ">" add | ">=" add)*
- add        = mul ("+" mul | "-" mul)*
- mul        = unary ("*" unary | "/" unary)*
- unary      = ("+" | "-")? primary
- primary    = num | ident | "(" expr ")"
-*/
-
 Node *new_node(NodeKind kind)
 {
     Node *node = calloc(1, sizeof(Node));
@@ -44,11 +31,21 @@ Node *new_num(int val)
     return node;
 }
 
-/* AST using EBNF (Extended Backus-Naur form)
-   recursive descent parser */ 
-// forward declarations for mutually recursive procedures
+Node *new_lvar(char name)
+{
+    Node *node = new_node(ND_LVAR);
+    node->name = name;
+    return node;
+}
+
+/* AST 
+   Recursive descent parser with EBNF grammar
+*/ 
+
+// Forward declarations for mutually recursive procedures
 Node *stmt();
 Node *expr();
+Node *assign();
 Node *equality();
 Node *relational();
 Node *add();
@@ -56,6 +53,7 @@ Node *mul();
 Node *unary();
 Node *primary();
 
+// program = stmt*
 Node *program() 
 {
     Node head;
@@ -69,6 +67,26 @@ Node *program()
     return head.next;
 }
 
+// stmt = "return" expr ";"
+//      | expr ";"
+Node *stmt()
+{
+    if (consume("return")) {
+        Node *node = new_unary(ND_RETURN, expr());
+        return node;
+    }
+    Node *node = new_unary(ND_EXPR_STMT, expr());
+    expect(";");
+    return node;
+}
+
+// expr = assign
+Node *expr()
+{
+    return assign();
+}
+
+// assign = equality ("=" assign)?
 Node *assign() 
 {
     Node *node = equality();
@@ -77,23 +95,7 @@ Node *assign()
     return node;
 }
 
-Node *expr()
-{
-    return equality();
-}
-
-Node *stmt()
-{
-    if (consume("return")) {
-        Node *node = new_unary(ND_RETURN, expr());
-        expect(";");
-        return node;
-    }
-    Node *node = new_unary(ND_EXPR_STMT, expr());
-    expect(";");
-    return node;
-}
-
+// equality = relational ("==" relational | "!=" relational)*
 Node *equality()
 {
     Node *node = relational();
@@ -107,6 +109,7 @@ Node *equality()
     }
 }
 
+// relational = add ("<" add | "<=" add | ">" add | ">=" add)*
 Node *relational()
 {
     Node *node = add();
@@ -124,6 +127,7 @@ Node *relational()
     }
 }
 
+// add = mul ("+" mul | "-" mul)*
 Node *add()
 {
     Node *node = mul();
@@ -137,6 +141,7 @@ Node *add()
     }
 }
 
+// mul = unary ("*" unary | "/" unary)*
 Node *mul()
 {
     Node *node = unary();
@@ -150,6 +155,8 @@ Node *mul()
     }
 }
 
+// unary = ("+" | "-")? unary
+//       | primary
 Node *unary()
 {
     if (consume("+"))
@@ -159,6 +166,7 @@ Node *unary()
     return primary();
 }
 
+// primary = "(" expr ")" | ident | num
 Node *primary()
 {
     if (consume("(")) {
@@ -166,6 +174,11 @@ Node *primary()
         expect(")");
         return node;
     }
-    
+    Token *tok = consume_ident();
+    if (tok) {
+        return new_lvar(*tok->str);
+    }
+        
     return new_num(expect_number());
 }
+

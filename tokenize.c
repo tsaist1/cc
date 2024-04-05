@@ -37,6 +37,14 @@ bool consume(char *op)
     return true;
 }
 
+Token *consume_ident() {
+    if (token->kind != TK_IDENTIFIER)
+        return NULL;
+    Token *t = token;
+    token = token->next;
+    return t;
+}
+
 void expect(char *op)
 {
     if (token->kind != TK_RESERVED || strlen(op) != token->len ||
@@ -128,7 +136,7 @@ Token *tokenize()
 
         if ('a' <= *p && *p <= 'z') {
             cur = new_token(TK_IDENTIFIER, cur, p++, 1);
-            cur->len = 1;
+            // cur->len = 1;
             continue;
         }
         

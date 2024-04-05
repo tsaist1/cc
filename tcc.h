@@ -28,6 +28,7 @@ struct Token
 void error(char *fmt, ...);
 void error_at(char *loc, char *fmt, ...);
 bool consume(char *op);
+Token *consume_ident();
 void expect(char *op);
 int expect_number();
 bool at_eof();
@@ -48,13 +49,11 @@ typedef enum
     ND_NE,        // !=
     ND_LT,        // <
     ND_LE,        // <=
+    ND_ASSIGN,    // = 
     ND_RETURN,    // "return"
     ND_EXPR_STMT, // Expression statement
-    ND_NUM,       // integer
-    
     ND_LVAR,      // local variable
-    ND_NEG,       // unary -
-    ND_ASSIGN,    // =
+    ND_NUM,       // integer
 } NodeKind;
 
 typedef struct Node Node;
@@ -62,9 +61,10 @@ typedef struct Node Node;
 struct Node
 {
     NodeKind kind; // Node type
-    Node *next;
+    Node *next;    // Next node
     Node *lhs;
     Node *rhs;
+    char name;     // Used if kind == ND_LVAR
     int val;	   // Used if kind == ND_NUM
     int offset;
      
