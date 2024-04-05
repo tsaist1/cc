@@ -1,5 +1,7 @@
 #include "tcc.h"
 
+Node *code[100];
+
 /* ***** Parsing Grammar *****
  program    = stmt*
  stmt       = expr ";"
@@ -55,6 +57,14 @@ Node *add();
 Node *mul();
 Node *unary();
 Node *primary();
+
+// void program()
+// {
+//     int i = 0;
+//     while (!at_eof())
+//         code[i++] = stmt();
+//     code[i] = NULL;
+// }
 
 Node *program() 
 {
@@ -169,3 +179,4 @@ Node *primary()
     
     return new_num(expect_number());
 }
+
